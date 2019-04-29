@@ -1,0 +1,2 @@
+# weather-slackbot
+weatherbot
