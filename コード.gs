@@ -4,8 +4,8 @@ function postSlackMessage() {
   var slackApp = SlackApp.create(token); //SlackApp インスタンスの取得
  
   var options = {
-    channelId: "#general", //チャンネル名
-    message: getWeather() //投稿するメッセージ
+    channelId: "#weather", //チャンネル名
+    message: getWeatherFromOWMapi() //投稿するメッセージ
   };
  
   slackApp.postMessage(options.channelId, options.message);
@@ -44,4 +44,50 @@ function getWeather() {
   
   return topSentence+bottomSentence;
   
+}
+
+
+function getWeatherFromOWMapi() {
+  
+  var api_key = "2141a039723571b370b2343542950973"
+  var tokyo_city_ID = "1850147"
+  var urayasu_city_ID = "1849186"
+  var url = "http://api.openweathermap.org/data/2.5/forecast?id="+urayasu_city_ID+"&APPID="+api_key
+  
+  var response = UrlFetchApp.fetch(url)
+  var object = JSON.parse(response.getContentText())
+  
+  var city = object.city.name
+  
+  var outputInfo = []
+  
+  for (i=0;i<5;i++) {
+    
+    var list = object.list[i]
+    var date = list.dt_txt
+    var temp = list.main.temp
+    var tempCelcius = Math.round((temp-273.15)*10)/10
+    var description = list.weather[0].description
+    
+    var info = {
+      date:date,
+      tempCelcius:tempCelcius,
+      description:description
+    }
+    
+    outputInfo.push(info)
+  }
+  
+  var message = ""
+  
+  for (j=0;j<5;j++){
+    
+    var partMessage = "\n"+outputInfo[j].date+"→"+outputInfo[j].description+"（"+outputInfo[j].tempCelcius+"℃)"
+    
+    var message = message + partMessage
+  }
+  
+  var topMessage = city+" city weather every 3 hours"
+  
+  return topMessage + message
 }
