@@ -1,16 +1,3 @@
-function postSlackMessage() {
-  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
- 
-  var slackApp = SlackApp.create(token); //SlackApp インスタンスの取得
- 
-  var options = {
-    channelId: "#weather", //チャンネル名
-    message: getWeatherFromOWMapi() //投稿するメッセージ
-  };
- 
-  slackApp.postMessage(options.channelId, options.message);
-}
-
 function getWeather() {
   var cityID = 130010;
   var url = 'http://weather.livedoor.com/forecast/webservice/json/v1?city=';
@@ -47,12 +34,84 @@ function getWeather() {
 }
 
 
-function getWeatherFromOWMapi() {
+//Urayasu
+
+function getUrayasuWeather() {
   
-  var api_key = "2141a039723571b370b2343542950973"
+  var apiKey = "2141a039723571b370b2343542950973"
   var tokyo_city_ID = "1850147"
   var urayasu_city_ID = "1849186"
-  var url = "http://api.openweathermap.org/data/2.5/forecast?id="+urayasu_city_ID+"&APPID="+api_key
+  var url = "http://api.openweathermap.org/data/2.5/forecast?id="+urayasu_city_ID+"&APPID="+apiKey
+  
+  var response = UrlFetchApp.fetch(url)
+  var object = JSON.parse(response.getContentText())
+  
+  var city = object.city.name
+  
+  
+  var outputInfo = []
+  
+  for (i=0;i<6;i++) {
+    
+    var list = object.list[i]
+    var datetimestamp = list.dt
+    var datetext = new Date((datetimestamp+60*60*9)*1000)
+    var date = datetext.toString().split('GMT-0000 (GMT)').join('')
+    var temp = list.main.temp
+    var tempCelcius = Math.round((temp-273.15)*10)/10
+    var description = list.weather[0].description
+    
+    var info = {
+      date:date,
+      tempCelcius:tempCelcius,
+      description:description
+    }
+    
+    outputInfo.push(info)
+  }
+  
+  
+  var message = ""
+  
+  for (j=0;j<6;j++){
+    
+    var partMessage = "\n"+outputInfo[j].date+"(JTC)→"+outputInfo[j].description+"（"+outputInfo[j].tempCelcius+"℃)"
+    var message = message + partMessage
+  }
+  
+  var topMessage = city+"🇯🇵 city weather every 3 hours"
+  
+  return topMessage + message
+}
+
+function postUrayasuWeather() {
+  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+ 
+  var slackApp = SlackApp.create(token); //SlackApp インスタンスの取得
+ 
+  var options = {
+    channelId: "#weather", //チャンネル名
+    message: getUrayasuWeather() //投稿するメッセージ
+  };
+ 
+  slackApp.postMessage(options.channelId, options.message);
+}
+
+
+//endUrayasu
+
+//Singapore
+
+function getSingaporeWeather() {
+  
+  var apiKey = "2141a039723571b370b2343542950973"
+  var tokyo_city_ID = "1850147"
+  var urayasu_city_ID = "1849186"
+  var singaporeID = "1880252"
+  //singaporeの朝7時は日本の8時
+  var berlin_city_ID = "2950159"
+  //berlinの朝7時は日本の14時
+  var url = "http://api.openweathermap.org/data/2.5/forecast?id="+singaporeID+"&APPID="+apiKey
   
   var response = UrlFetchApp.fetch(url)
   var object = JSON.parse(response.getContentText())
@@ -61,10 +120,12 @@ function getWeatherFromOWMapi() {
   
   var outputInfo = []
   
-  for (i=0;i<5;i++) {
+  for (i=0;i<6;i++) {
     
     var list = object.list[i]
-    var date = list.dt_txt
+    var datetimestamp = list.dt
+    var datetext = new Date((datetimestamp+60*60*8)*1000)
+    var date = datetext.toString().split('GMT-0000 (GMT)').join('')
     var temp = list.main.temp
     var tempCelcius = Math.round((temp-273.15)*10)/10
     var description = list.weather[0].description
@@ -80,14 +141,103 @@ function getWeatherFromOWMapi() {
   
   var message = ""
   
-  for (j=0;j<5;j++){
+  for (j=0;j<6;j++){
     
-    var partMessage = "\n"+outputInfo[j].date+"→"+outputInfo[j].description+"（"+outputInfo[j].tempCelcius+"℃)"
-    
+    var partMessage = "\n"+outputInfo[j].date+"(SGT)→"+outputInfo[j].description+"（"+outputInfo[j].tempCelcius+"℃)"
     var message = message + partMessage
   }
   
-  var topMessage = city+" city weather every 3 hours"
+  var topMessage = city+"🇸🇬 weather every 3 hours"
   
   return topMessage + message
+}
+
+function postSingaporeWeather() {
+  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+ 
+  var slackApp = SlackApp.create(token); //SlackApp インスタンスの取得
+ 
+  var options = {
+    channelId: "#weather", //チャンネル名
+    message: getSingaporeWeather() //投稿するメッセージ
+  };
+ 
+  slackApp.postMessage(options.channelId, options.message);
+}
+
+//endSingapore
+
+//Berlin
+
+function getBerlinWeather() {
+  
+  var apiKey = "2141a039723571b370b2343542950973"
+  var tokyo_city_ID = "1850147"
+  var urayasu_city_ID = "1849186"
+  var singaporeID = "1880252"
+  //singaporeの朝7時は日本の8時
+  var berlin_city_ID = "2950159"
+  //berlinの朝7時は日本の14時
+  var url = "http://api.openweathermap.org/data/2.5/forecast?id="+berlin_city_ID+"&APPID="+apiKey
+  
+  var response = UrlFetchApp.fetch(url)
+  var object = JSON.parse(response.getContentText())
+  
+  var city = object.city.name
+  
+  var outputInfo = []
+  
+  for (i=0;i<6;i++) {
+    
+    var list = object.list[i]
+    var datetimestamp = list.dt
+    var datetext = new Date((datetimestamp+60*60*2)*1000)
+    var date = datetext.toString().split('GMT-0000 (GMT)').join('')
+    var temp = list.main.temp
+    var tempCelcius = Math.round((temp-273.15)*10)/10
+    var description = list.weather[0].description
+    
+    var info = {
+      date:date,
+      tempCelcius:tempCelcius,
+      description:description
+    }
+    
+    outputInfo.push(info)
+  }
+  
+  var message = ""
+  
+  for (j=0;j<6;j++){
+    
+    var partMessage = "\n"+outputInfo[j].date+"(CEST)→"+outputInfo[j].description+"（"+outputInfo[j].tempCelcius+"℃)"
+    var message = message + partMessage
+  }
+  
+  var topMessage = city+"🇩🇪 city weather every 3 hours"
+  
+  return topMessage + message
+}
+function postBerlinWeather() {
+  var token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
+ 
+  var slackApp = SlackApp.create(token); //SlackApp インスタンスの取得
+ 
+  var options = {
+    channelId: "#weather", //チャンネル名
+    message: getBerlinWeather() //投稿するメッセージ
+  };
+ 
+  slackApp.postMessage(options.channelId, options.message);
+}
+
+//endBerlin
+
+
+function UnixToJst() {
+  
+  var d = new Date()
+  Logger.log(d)
+  var date = new Date( 1567522800 * 1000 )
+  Logger.log(date)
 }
