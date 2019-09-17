@@ -48,7 +48,6 @@ function getUrayasuWeather() {
   
   var city = object.city.name
   
-  
   var outputInfo = []
   
   for (i=0;i<6;i++) {
@@ -60,22 +59,24 @@ function getUrayasuWeather() {
     var temp = list.main.temp
     var tempCelcius = Math.round((temp-273.15)*10)/10
     var description = list.weather[0].description
+    var icon = list.weather[0].icon
     
     var info = {
       date:date,
       tempCelcius:tempCelcius,
-      description:description
+      description:description,
+      icon:icon
     }
     
     outputInfo.push(info)
   }
-  
+  Logger.log(outputInfo)
   
   var message = ""
   
   for (j=0;j<6;j++){
     
-    var partMessage = "\n"+outputInfo[j].date+"(JTC)→"+outputInfo[j].description+"（"+outputInfo[j].tempCelcius+"℃)"
+    var partMessage = "\n"+outputInfo[j].date+"(JTC)→"+outputInfo[j].description+":"+outputInfo[j].icon+":（"+outputInfo[j].tempCelcius+"℃)"
     var message = message + partMessage
   }
   
@@ -129,11 +130,13 @@ function getSingaporeWeather() {
     var temp = list.main.temp
     var tempCelcius = Math.round((temp-273.15)*10)/10
     var description = list.weather[0].description
+    var icon = list.weather[0].icon
     
     var info = {
       date:date,
       tempCelcius:tempCelcius,
-      description:description
+      description:description,
+      icon:icon
     }
     
     outputInfo.push(info)
@@ -143,7 +146,7 @@ function getSingaporeWeather() {
   
   for (j=0;j<6;j++){
     
-    var partMessage = "\n"+outputInfo[j].date+"(SGT)→"+outputInfo[j].description+"（"+outputInfo[j].tempCelcius+"℃)"
+    var partMessage = "\n"+outputInfo[j].date+"(JTC)→"+outputInfo[j].description+":"+outputInfo[j].icon+":（"+outputInfo[j].tempCelcius+"℃)"
     var message = message + partMessage
   }
   
@@ -196,11 +199,13 @@ function getBerlinWeather() {
     var temp = list.main.temp
     var tempCelcius = Math.round((temp-273.15)*10)/10
     var description = list.weather[0].description
+    var icon = list.weather[0].icon
     
     var info = {
       date:date,
       tempCelcius:tempCelcius,
-      description:description
+      description:description,
+      icon:icon
     }
     
     outputInfo.push(info)
@@ -210,7 +215,7 @@ function getBerlinWeather() {
   
   for (j=0;j<6;j++){
     
-    var partMessage = "\n"+outputInfo[j].date+"(CEST)→"+outputInfo[j].description+"（"+outputInfo[j].tempCelcius+"℃)"
+    var partMessage = "\n"+outputInfo[j].date+"(JTC)→"+outputInfo[j].description+":"+outputInfo[j].icon+":（"+outputInfo[j].tempCelcius+"℃)"
     var message = message + partMessage
   }
   
